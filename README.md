@@ -1,18 +1,23 @@
-# Salesforce DX Project: Next Steps
+# Interaction Model
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+## Summary
 
-## How Do You Plan to Deploy Your Changes?
+The Interaction Model project addresses a business use case for companies seeking to reduce duplicate leads and contacts generated from on online form by managing form submits as individual interactions. In a scenario where website visitors who may be existing customers, previously vetted leads, or new to the brand can submit their contact information and product preferences through an online contact form, this project automates the process of creating new leads and opportunities by translating visitor interactions within a Salesforce environment.
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+## Key Features
 
-## Configure Your Salesforce DX Project
+- **Data Integration**: On user submission, the Interaction Model project sends the collected information through a Salesforce org webservice class.
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+- **Interaction Record Creation**: The project automatically generates a new `Interaction__c` record in Salesforce, capturing crucial visitor data.
 
-## Read All About It
+- **Contact & Lead Matching**: A Flow is triggered on creation to check for duplicate contacts or leads given the visitor's information using custom invocable Apex actions.
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+- **Opportunity Creation**: If a matching contact is found, the system associates the interaction with the existing contact and creates a new opportunity based on the selected product of interest.
+
+- **Lead Creation**: If no match is found, the project initiates the creation of a new lead.
+
+- **Email Notifications**: Whenever a new lead or opportunity is created, an email notification is sent to the responsible owner, ensuring prompt follow-up.
+
+- **User-Friendly Interface**: The Interaction Model offers a Lightning Web Component embedded within an Experience Cloud site, allowing sales representatives to conveniently view interactions related to the contacts or leads they manage.
+
+- **Data Cleanup**: To maintain database efficiency, the project includes a scheduled batch process that deletes interactions older than 3 days.
