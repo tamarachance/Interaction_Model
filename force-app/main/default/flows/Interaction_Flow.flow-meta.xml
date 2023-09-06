@@ -18,7 +18,10 @@
             </value>
         </inputParameters>
         <nameSegment>DuplicateLeadAction</nameSegment>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
+        <outputParameters>
+            <assignToReference>duplicateLead</assignToReference>
+            <name>output</name>
+        </outputParameters>
         <versionSegment>1</versionSegment>
     </actionCalls>
     <actionCalls>
@@ -39,17 +42,32 @@
             </value>
         </inputParameters>
         <nameSegment>DuplicateQueryAction</nameSegment>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
+        <outputParameters>
+            <assignToReference>duplicateContact</assignToReference>
+            <name>output</name>
+        </outputParameters>
         <versionSegment>1</versionSegment>
     </actionCalls>
     <actionCalls>
         <name>Lead_Assignment_Email</name>
         <label>Lead Assignment Email</label>
         <locationX>578</locationX>
-        <locationY>1079</locationY>
+        <locationY>971</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.Owner:User.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>INFORM: A New Lead Has Been Assigned To You</stringValue>
+            </value>
+        </inputParameters>
         <inputParameters>
             <name>emailBody</name>
             <value>
@@ -57,21 +75,9 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailAddresses</name>
-            <value>
-                <elementReference>Get_New_Lead_Record.Owner:User.Email</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
             <name>sendRichBody</name>
             <value>
                 <booleanValue>true</booleanValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailSubject</name>
-            <value>
-                <stringValue>INFORM: A New Lead Has Been Assigned To You</stringValue>
             </value>
         </inputParameters>
         <nameSegment>emailSimple</nameSegment>
@@ -82,10 +88,22 @@
         <name>Opportunity_Assignment_Email</name>
         <label>Opportunity Assignment Email</label>
         <locationX>50</locationX>
-        <locationY>971</locationY>
+        <locationY>863</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.Account__r.Owner.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>INFORM: A New Opportunity Has Been Assigned To You</stringValue>
+            </value>
+        </inputParameters>
         <inputParameters>
             <name>emailBody</name>
             <value>
@@ -93,21 +111,9 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>emailAddresses</name>
-            <value>
-                <elementReference>Get_New_Oppty_Record.Account.Owner.Email</elementReference>
-            </value>
-        </inputParameters>
-        <inputParameters>
             <name>sendRichBody</name>
             <value>
                 <booleanValue>true</booleanValue>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>emailSubject</name>
-            <value>
-                <stringValue>INFORM: A New Opportunity Has Been Assigned To You</stringValue>
             </value>
         </inputParameters>
         <nameSegment>emailSimple</nameSegment>
@@ -127,7 +133,7 @@
             <name>MatchesExistingContact</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Check_for_Related_Contacts</leftValueReference>
+                <leftValueReference>duplicateContact</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -152,7 +158,7 @@
             <name>MatchesExistingLead</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Check_for_Dupe_Leads</leftValueReference>
+                <leftValueReference>duplicateLead</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>false</booleanValue>
@@ -198,8 +204,9 @@
         <label>Create a new Lead</label>
         <locationX>578</locationX>
         <locationY>755</locationY>
+        <assignRecordIdToReference>newLeadId</assignRecordIdToReference>
         <connector>
-            <targetReference>Get_New_Lead_Record</targetReference>
+            <targetReference>Update_Lead_Field</targetReference>
         </connector>
         <inputAssignments>
             <field>City</field>
@@ -256,7 +263,6 @@
             </value>
         </inputAssignments>
         <object>Lead</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
     <recordCreates>
         <name>Create_An_Opportunity</name>
@@ -264,12 +270,12 @@
         <locationX>50</locationX>
         <locationY>755</locationY>
         <connector>
-            <targetReference>Get_New_Oppty_Record</targetReference>
+            <targetReference>Opportunity_Assignment_Email</targetReference>
         </connector>
         <inputAssignments>
             <field>AccountId</field>
             <value>
-                <elementReference>$Record.Account__r.Id</elementReference>
+                <elementReference>duplicateContact.AccountId</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -287,7 +293,7 @@
         <inputAssignments>
             <field>OwnerId</field>
             <value>
-                <elementReference>$Record.Account__r.OwnerId</elementReference>
+                <elementReference>duplicateContact.Account.OwnerId</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -299,50 +305,6 @@
         <object>Opportunity</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
-    <recordLookups>
-        <description>Gets the newly created Lead record.</description>
-        <name>Get_New_Lead_Record</name>
-        <label>Get New Lead Record</label>
-        <locationX>578</locationX>
-        <locationY>863</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Update_Lead_Field</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>Create_a_new_Lead</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Lead</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <description>Gets the newly created opportunity record.</description>
-        <name>Get_New_Oppty_Record</name>
-        <label>Get New Oppty Record</label>
-        <locationX>50</locationX>
-        <locationY>863</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Opportunity_Assignment_Email</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>Create_An_Opportunity</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Opportunity</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
     <recordUpdates>
         <description>Updates the contact look up field on the triggering interaction to match the contact record found. Also updates the account lookup field.</description>
         <name>Update_Contact_Field_on_Interaction</name>
@@ -355,13 +317,13 @@
         <inputAssignments>
             <field>Account__c</field>
             <value>
-                <elementReference>Check_for_Related_Contacts.Account.Id</elementReference>
+                <elementReference>duplicateContact.AccountId</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
             <field>Contact__c</field>
             <value>
-                <elementReference>Check_for_Related_Contacts.Id</elementReference>
+                <elementReference>duplicateContact.Id</elementReference>
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
@@ -379,7 +341,7 @@
             <field>Id</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Check_for_Related_Contacts.Id</elementReference>
+                <elementReference>duplicateContact.Id</elementReference>
             </value>
         </filters>
         <inputAssignments>
@@ -431,14 +393,14 @@
         <name>Update_Lead_Field</name>
         <label>Update Lead Field</label>
         <locationX>578</locationX>
-        <locationY>971</locationY>
+        <locationY>863</locationY>
         <connector>
             <targetReference>Lead_Assignment_Email</targetReference>
         </connector>
         <inputAssignments>
             <field>Lead__c</field>
             <value>
-                <elementReference>Get_New_Lead_Record.Id</elementReference>
+                <elementReference>newLeadId</elementReference>
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
@@ -455,7 +417,7 @@
         <inputAssignments>
             <field>Lead__c</field>
             <value>
-                <elementReference>Check_for_Dupe_Leads.Id</elementReference>
+                <elementReference>duplicateLead.Id</elementReference>
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
@@ -470,7 +432,7 @@
             <field>Id</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Check_for_Dupe_Leads.Id</elementReference>
+                <elementReference>duplicateLead.Id</elementReference>
             </value>
         </filters>
         <inputAssignments>
@@ -555,6 +517,41 @@
         <isViewedAsPlainText>false</isViewedAsPlainText>
         <text>&lt;p&gt;A New Opportunity Has Been Assigned To You&lt;/p&gt;</text>
     </textTemplates>
+    <variables>
+        <description>If a duplicate contact was found, this variable holds the contact record Id.</description>
+        <name>duplicateContact</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Contact</objectType>
+    </variables>
+    <variables>
+        <description>Holds the existing Lead record that matches the interaction email</description>
+        <name>duplicateLead</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Lead</objectType>
+    </variables>
+    <variables>
+        <description>This hold the new Lead Id</description>
+        <name>newLeadId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>This is the record variable for the newly created opportunity record.</description>
+        <name>newOppty</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Opportunity</objectType>
+    </variables>
     <variables>
         <name>OwnerEmail</name>
         <dataType>String</dataType>
