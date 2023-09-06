@@ -543,23 +543,4 @@
         <isInput>false</isInput>
         <isOutput>false</isOutput>
     </variables>
-    <variables>
-        <description>This is the record variable for the newly created opportunity record.</description>
-        <name>newOppty</name>
-        <dataType>SObject</dataType>
-        <isCollection>false</isCollection>
-        <isInput>false</isInput>
-        <isOutput>false</isOutput>
-        <objectType>Opportunity</objectType>
-    </variables>
-    <variables>
-        <name>OwnerEmail</name>
-        <dataType>String</dataType>
-        <isCollection>false</isCollection>
-        <isInput>true</isInput>
-        <isOutput>false</isOutput>
-        <value>
-            <elementReference>$Record.Lead__r.Owner:User.Email</elementReference>
-        </value>
-    </variables>
 </Flow>
